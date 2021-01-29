@@ -10,7 +10,7 @@ def gen_proto_for_services():
     # from webserver.api.commands_with_grpc import router as commands_with_grpc_router
     # routes = commands_with_grpc_router.routes
     routes = []
-    gen_protobuf_from_routes(routes)
+    print(gen_protobuf_from_routes(routes))
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
