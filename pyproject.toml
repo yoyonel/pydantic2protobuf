@@ -35,6 +35,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.1, <4.0"
+grpcio-tools = "^1.35.0"
+pydantic = "^1.7.3"
+stringcase = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
@@ -82,3 +85,7 @@ exclude = '''
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+# https://docs.pytest.org/en/stable/customize.html?highlight=tool%20pytest%20ini_options#pyproject-toml
+[tool.pytest.ini_options]
+# https://docs.pytest.org/en/stable/doctest.html?highlight=doctest%20modules#doctest-integration-for-modules-and-test-files
+addopts = "--doctest-modules"
