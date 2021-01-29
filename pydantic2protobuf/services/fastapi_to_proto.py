@@ -2,11 +2,11 @@ from pathlib import Path
 
 import stringcase
 
-from pydantic2protobuf.services.to_proto import pydantic_to_proto
+from pydantic2protobuf.services.pydantic_to_proto import pydantic_to_proto
 from pydantic2protobuf.tools.to_proto import PYTHON_TO_PROTOBUF_TYPES, gen_all_proto_msg_from_routes, is_type_iterable
 
 
-def gen_protobuf_from_route(route):
+def route_to_proto(route):
     response_proto_msg = None
     request_proto_msg = None
 
@@ -52,13 +52,13 @@ def gen_protobuf_from_route(route):
     return response_proto_msg, request_proto_msg, service_definition
 
 
-def gen_protobuf_from_routes(routes, service_name: str = "Service") -> str:
+def routes_to_proto(routes, service_name: str = "Service") -> str:
     requests_proto_msg = []
     responses_proto_msg = []
     services_definitions = []
 
     for route in routes:
-        response_proto_msg, request_proto_msg, service_definition = gen_protobuf_from_route(route)
+        response_proto_msg, request_proto_msg, service_definition = route_to_proto(route)
         requests_proto_msg.append(request_proto_msg)
         responses_proto_msg.append(response_proto_msg)
         services_definitions.append(service_definition)
