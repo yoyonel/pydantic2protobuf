@@ -1,0 +1,19 @@
+{
+    "template": "https://github.com/yoyonel/cookiecutter-pypackage.git",
+    "commit": "ca40a655346dd9d411448b275aacbab0202b3113",
+    "context": {
+        "cookiecutter": {
+            "author": "Lionel ATTY",
+            "author_email": "yoyonel@hotmail.com",
+            "github_username": "yoyonel",
+            "project_name": "pydantic2protobuf",
+            "project_slug": "pydantic2protobuf",
+            "short_description": "Generate protobuf file from Pydantic models",
+            "version": "0.1.0",
+            "line_length": "120",
+            "uses_django": "n",
+            "_template": "https://github.com/yoyonel/cookiecutter-pypackage.git"
+        }
+    },
+    "directory": null
+}
