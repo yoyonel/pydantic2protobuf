@@ -5,7 +5,7 @@ from parametrization import Parametrization
 from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
-from pydantic2protobuf.services.to_proto import pydantic_to_proto
+from pydantic2protobuf.services.pydantic_to_proto import pydantic_to_proto
 from tests.tools.parametrization_case import IParametrizationCase
 
 
