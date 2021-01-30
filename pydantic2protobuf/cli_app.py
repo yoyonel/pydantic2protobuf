@@ -8,7 +8,7 @@ from pydantic2protobuf.services.fastapi_to_proto import routes_to_proto
 @click.command()
 def gen_proto_for_services():
     # from webserver.api.commands_with_grpc import router as commands_with_grpc_router
-    # routes = commands_with_grpc_router.routes
+    # api = commands_with_grpc_router.api
     routes = []
     print(routes_to_proto(routes))
 
