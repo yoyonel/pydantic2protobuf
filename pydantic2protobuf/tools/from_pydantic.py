@@ -7,6 +7,7 @@ from pydantic.main import ModelMetaclass
 
 uint32 = NewType("uint32", int)
 
+
 T = TypeVar("T")
 
 PYTHON_TO_PROTOBUF_TYPES: Dict[Any, str] = {
@@ -51,7 +52,7 @@ def proto_field(
     """
     return {
         "extra": {
-            "proto": {
+            "protobuf": {
                 "number": number,
                 "protobuf_message": protobuf_message,
                 "allow_none": allow_none,
@@ -77,7 +78,7 @@ def extract_proto_fields(properties: Dict, default_number: int) -> Dict:
             "is_unsigned": False,
             "disable_rpc": False,
         },
-        **properties.get("extra", {}).get("proto", {}),
+        **properties.get("extra", {}).get("protobuf", {}),
     }
 
 
