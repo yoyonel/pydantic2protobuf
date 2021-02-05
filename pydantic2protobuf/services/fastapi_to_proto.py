@@ -56,7 +56,9 @@ def proto_gen_services(service_name, routes) -> str:
 
 def proto_gen_messages(routes: List[APIRoute]) -> str:
     """"""
-    return new_line.join(pydantic_to_proto(model_meta_class) for model_meta_class in extract_model_meta_classes(routes))
+    return new_line.join(
+        pydantic_to_proto(model_meta_class) for model_meta_class in set(extract_model_meta_classes(routes))
+    )
 
 
 def routes_to_proto(routes: List[APIRoute], service_name: str = "Service") -> str:

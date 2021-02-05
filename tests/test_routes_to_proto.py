@@ -11,6 +11,7 @@ def test_router_with_nested_models():
 
 def test_router_with_containers():
     proto = routes_to_proto(router_with_containers.routes)
+    # FIXME: remove this print (debug purpose)
     print(proto)
     assert "rpc do_with_response_list (google.protobuf.Empty) returns (stream WithBasicTypes);" in proto
     assert "rpc do_with_request_list (stream WithBasicTypes)" in proto
