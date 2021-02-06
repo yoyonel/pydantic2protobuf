@@ -5,7 +5,7 @@ from parametrization import Parametrization
 from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
-from pydantic2protobuf.services.pydantic_to_proto import pydantic_to_proto
+from pydantic2protobuf.services.pydantic_to_proto import gen_message_definition
 from tests.tools.parametrization_case import IParametrizationCase
 
 
@@ -39,5 +39,5 @@ class ParametrizationCase(IParametrizationCase):
     )
 )
 def test_pydantic_model_to_proto_msg(pydantic_model, expected_proto_msg):
-    generated_proto_msg = pydantic_to_proto(pydantic_model)
+    generated_proto_msg = gen_message_definition(pydantic_model)
     assert generated_proto_msg == expected_proto_msg

@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from pydantic2protobuf.services.fastapi_to_proto import routes_to_proto
+from pydantic2protobuf.services.fastapi_to_proto import gen_proto_file_contents
 
 
 @click.command()
@@ -10,7 +10,7 @@ def gen_proto_for_services():
     # from webserver.api.commands_with_grpc import router as commands_with_grpc_router
     # api = commands_with_grpc_router.api
     routes = []
-    print(routes_to_proto(routes))
+    print(gen_proto_file_contents(routes))
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
