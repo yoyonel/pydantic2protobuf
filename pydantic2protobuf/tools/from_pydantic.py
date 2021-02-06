@@ -1,5 +1,5 @@
 from collections import abc
-from typing import Any, ByteString, Dict, Iterable, List, NewType, Optional, Type, TypeVar
+from typing import Any, ByteString, Dict, Iterable, List, NewType, Optional, Type
 
 from pydantic import BaseModel
 from pydantic.fields import ModelField
@@ -7,10 +7,7 @@ from pydantic.main import ModelMetaclass
 
 uint32 = NewType("uint32", int)
 
-
-T = TypeVar("T")
-
-PYTHON_TO_PROTOBUF_TYPES: Dict[Any, str] = {
+PythonToProtoBufTypes: Dict[Any, str] = {
     bool: "bool",
     bytes: "str",
     ByteString: "str",
@@ -20,7 +17,8 @@ PYTHON_TO_PROTOBUF_TYPES: Dict[Any, str] = {
     Dict: "google.protobuf.Struct",
     uint32: "uint32",
 }
-PYTHON_TO_GOOGLE_PROTOBUF_TYPES: Dict[Any, str] = {
+
+PythonToGoogleProtoBufTypes: Dict[Any, str] = {
     bool: "google.protobuf.BoolValue",
     bytes: "google.protobuf.StringValue",
     ByteString: "google.protobuf.StringValue",
@@ -29,27 +27,26 @@ PYTHON_TO_GOOGLE_PROTOBUF_TYPES: Dict[Any, str] = {
     str: "google.protobuf.StringValue",
 }
 
+DEFAULT_DICT_FOR_PROTO_FIELDS = {
+    "protobuf_message": None,
+    "allow_none": True,
+    "is_unsigned": False,
+    "disable_rpc": False,
+}
+
 
 class Chunkify(BaseModel):
     pass
 
 
-def proto_field(
+def gen_extra_fields(
     number: int,
     protobuf_message: Optional[str] = None,
     allow_none: bool = True,
     is_unsigned: bool = False,
     disable_rpc: bool = False,
 ) -> Dict:
-    """
-
-    :param number:
-    :param protobuf_message:
-    :param allow_none:
-    :param is_unsigned:
-    :param disable_rpc:
-    :return:
-    """
+    """"""
     return {
         "extra": {
             "protobuf": {
@@ -63,43 +60,24 @@ def proto_field(
     }
 
 
-def extract_proto_fields(properties: Dict, default_number: int) -> Dict:
-    """
-
-    :param properties:
-    :param default_number:
-    :return:
-    """
+def extract_proto_fields(cls_properties: Dict, default_number: int) -> Dict:
+    """"""
     return {
-        **{
-            "number": default_number,
-            "protobuf_message": None,
-            "allow_none": True,
-            "is_unsigned": False,
-            "disable_rpc": False,
-        },
-        **properties.get("extra", {}).get("protobuf", {}),
+        **DEFAULT_DICT_FOR_PROTO_FIELDS,
+        **{"number": default_number},
+        **cls_properties.get("extra", {}).get("protobuf", {}),
     }
 
 
-def is_type_iterable(field_: Type[T]) -> bool:
-    """
-
-    :param field_:
-    :return:
-    """
-    return getattr(field_, "__origin__", None) in {list, List, Iterable, abc.Iterable} or issubclass(field_, Chunkify)
+def is_type_iterable(field: Any) -> bool:
+    """"""
+    return getattr(field, "__origin__", None) in {list, List, Iterable, abc.Iterable} or issubclass(field, Chunkify)
 
 
-def extract_model_meta_classes(model_meta_class) -> List[Type[ModelMetaclass]]:
-    """
-
-    :param model_meta_class:
-    :return:
-    """
-    results: List[Type[ModelMetaclass]] = [model_meta_class]
+def extract_model_meta_classes(model_meta_class: Any) -> List[Type[ModelMetaclass]]:
+    """"""
     model_fields: Iterable[ModelField] = model_meta_class.__fields__.values()
-    for model_field in model_fields:
-        if isinstance(model_field.type_, ModelMetaclass):
-            results.extend(extract_model_meta_classes(model_field.type_))
+    results: List[Type[ModelMetaclass]] = [model_meta_class]
+    for model_field in filter(lambda mf: isinstance(mf.type_, ModelMetaclass), model_fields):
+        results.extend(extract_model_meta_classes(model_field.type_))
     return results

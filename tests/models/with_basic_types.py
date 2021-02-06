@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from pydantic2protobuf.tools.from_pydantic import gen_extra_fields
+
 
 class WithBasicTypes(BaseModel):
     __expected_proto__ = """message WithBasicTypes {
@@ -10,4 +12,4 @@ class WithBasicTypes(BaseModel):
 """
     float_field: float
     integer_field: int
-    unsigned_integer_field: int = Field(extra={"protobuf": {"is_unsigned": True}})
+    unsigned_integer_field: int = Field(**gen_extra_fields(number=3, is_unsigned=True))
