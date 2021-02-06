@@ -1,11 +1,12 @@
+import itertools
 from collections import abc
-from typing import Any, ByteString, Dict, Iterable, List, NewType, Optional, Type
+from typing import Any, ByteString, Dict, Iterable, Iterator, List, Optional, Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, PositiveInt
 from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
-uint32 = NewType("uint32", int)
+from pydantic2protobuf.tools.pydantic_protobuf_types import UInt32Value
 
 PythonToProtoBufTypes: Dict[Any, str] = {
     bool: "bool",
@@ -15,7 +16,8 @@ PythonToProtoBufTypes: Dict[Any, str] = {
     int: "int32",
     str: "string",
     Dict: "google.protobuf.Struct",
-    uint32: "uint32",
+    # https://pydantic-docs.helpmanual.io/usage/types/
+    PositiveInt: "uint32",
 }
 
 PythonToGoogleProtoBufTypes: Dict[Any, str] = {
@@ -23,7 +25,8 @@ PythonToGoogleProtoBufTypes: Dict[Any, str] = {
     bytes: "google.protobuf.StringValue",
     ByteString: "google.protobuf.StringValue",
     float: "google.protobuf.FloatValue",
-    int: "google.protobuf.UInt32Value",
+    int: "google.protobuf.Int64Value",
+    UInt32Value: "google.protobuf.UInt32Value",
     str: "google.protobuf.StringValue",
 }
 
@@ -74,10 +77,15 @@ def is_type_iterable(field: Any) -> bool:
     return getattr(field, "__origin__", None) in {list, List, Iterable, abc.Iterable} or issubclass(field, Chunkify)
 
 
-def extract_model_meta_classes(model_meta_class: Any) -> List[Type[ModelMetaclass]]:
+def extract_model_meta_classes(model_meta_class: Any) -> Iterator[Type[ModelMetaclass]]:
     """"""
     model_fields: Iterable[ModelField] = model_meta_class.__fields__.values()
-    results: List[Type[ModelMetaclass]] = [model_meta_class]
-    for model_field in filter(lambda mf: isinstance(mf.type_, ModelMetaclass), model_fields):
-        results.extend(extract_model_meta_classes(model_field.type_))
-    return results
+    return itertools.chain(
+        *(
+            *([model_meta_class],),
+            *(
+                extract_model_meta_classes(model_field.type_)
+                for model_field in filter(lambda mf: isinstance(mf.type_, ModelMetaclass), model_fields)
+            ),
+        )
+    )

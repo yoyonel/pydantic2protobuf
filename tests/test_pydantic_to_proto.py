@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
 from pydantic2protobuf.services.pydantic_to_proto import add_repeated_qualifier, gen_message_definition, translate_type
+from tests.models import IBaseModelForUTest
 from tests.models.with_basic_types import WithBasicTypes
 from tests.models.with_nested_models import WithNestedModelsResponse
 from tests.models.with_optional_fields import WithOptionalFields
@@ -15,7 +16,7 @@ from tests.tools.parametrization_case import IParametrizationCase
 
 @dataclass
 class ParametrizationCasePMTPM(IParametrizationCase):
-    pydantic_model: Type[BaseModel]
+    pydantic_model: Type[IBaseModelForUTest]
 
 
 @Parametrization.autodetect_parameters()
@@ -23,9 +24,9 @@ class ParametrizationCasePMTPM(IParametrizationCase):
 @IParametrizationCase.case(ParametrizationCasePMTPM("with optional fields", WithOptionalFields))
 @IParametrizationCase.case(ParametrizationCasePMTPM("with nested models", WithNestedModelsResponse))
 @IParametrizationCase.case(ParametrizationCasePMTPM("with repeated fields", WithRepeatedFields))
-def test_pydantic_model_to_proto_msg(pydantic_model):
+def test_pydantic_model_to_proto_msg(pydantic_model: IBaseModelForUTest):
     generated_proto_msg = gen_message_definition(pydantic_model)
-    assert generated_proto_msg == pydantic_model.__expected_proto__
+    assert generated_proto_msg == pydantic_model.get_expected_protobuf()
 
 
 @dataclass
