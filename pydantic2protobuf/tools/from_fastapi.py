@@ -10,10 +10,14 @@ from pydantic2protobuf.tools.from_pydantic import extract_model_meta_classes as 
 def extract_model_meta_class(route: APIRoute) -> List[Type[ModelMetaclass]]:
     all_model_meta_classes: List[Type[ModelMetaclass]] = []
     # from request field
-    if request_field := route.dependant.body_params:
+    # if request_field := route.dependant.body_params:
+    request_field = route.dependant.body_params
+    if request_field:
         all_model_meta_classes.extend(extract_model_meta_classes_from_mmc(request_field[0].type_))
     # from response
-    if response_field := route.response_field:
+    # if response_field := route.response_field:
+    response_field = route.response_field
+    if response_field:
         all_model_meta_classes.extend(extract_model_meta_classes_from_mmc(response_field.type_))
     return all_model_meta_classes
 
