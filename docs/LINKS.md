@@ -40,6 +40,13 @@ https://github.com/samuelcolvin/pydantic
 ## utest
 https://github.com/samuelcolvin/pydantic/tree/master/tests
 
+## Custom Data Types
+- https://pydantic-docs.helpmanual.io/usage/types/#custom-data-types
+- https://googleapis.dev/python/bigquery/1.27.2/_modules/google/protobuf/wrappers_pb2.html
+- https://pydantic-docs.helpmanual.io/usage/types/#constrained-types
+- https://pydantic-docs.helpmanual.io/usage/types/#pydantic-types
+- https://github.com/tiangolo/fastapi/issues/453
+
 # MyPy
 https://github.com/python/mypy
 > Mypy is an optional static type checker for Python.
