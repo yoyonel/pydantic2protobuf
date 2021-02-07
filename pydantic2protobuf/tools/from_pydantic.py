@@ -37,6 +37,8 @@ DEFAULT_DICT_FOR_PROTO_FIELDS = {
     "disable_rpc": False,
 }
 
+LIST_TYPES_ITERABLES = {list, List, Iterable, abc.Iterable}
+
 
 class Chunkify(BaseModel):
     pass
@@ -74,18 +76,24 @@ def extract_proto_fields(cls_properties: Dict, default_number: int) -> Dict:
 
 def is_type_iterable(field: Any) -> bool:
     """"""
-    return getattr(field, "__origin__", None) in {list, List, Iterable, abc.Iterable} or issubclass(field, Chunkify)
+    return getattr(field, "__origin__", None) in LIST_TYPES_ITERABLES or issubclass(field, Chunkify)
 
 
 def extract_model_meta_classes(model_meta_class: Any) -> Iterator[Type[ModelMetaclass]]:
     """"""
     model_fields: Iterable[ModelField] = model_meta_class.__fields__.values()
+    # TODO: remove recurrence
+    model_meta_classes = [
+        extract_model_meta_classes(model_field.type_)
+        for model_field in filter(lambda mf: isinstance(mf.type_, ModelMetaclass), model_fields)
+    ]
     return itertools.chain(
         *(
-            *([model_meta_class],),
             *(
-                extract_model_meta_classes(model_field.type_)
-                for model_field in filter(lambda mf: isinstance(mf.type_, ModelMetaclass), model_fields)
+                [
+                    model_meta_class,
+                ],
             ),
+            *model_meta_classes,
         )
     )
