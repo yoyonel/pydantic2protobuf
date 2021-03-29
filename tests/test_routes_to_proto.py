@@ -4,7 +4,7 @@ from tests.api.with_nested_fields import router as router_with_nested_models
 
 
 def test_router_with_nested_models():
-    patterns_to_find = (
+    expected_patterns_to_find = (
         """pydantic2protobuf/pydantic2protobuf/services/fastapi_to_proto.py.  DO NOT EDIT!
 syntax = "proto3";
 
@@ -43,14 +43,13 @@ import "google/protobuf/empty.proto";
     string commit_hex_sha = 3;
 }""",
     )
-    proto = gen_proto_file_contents(router_with_nested_models.routes)
-    for pattern_to_find in patterns_to_find:
-        assert pattern_to_find in proto
+    generated_proto = gen_proto_file_contents(router_with_nested_models.routes)
+    for expected_pattern_to_find in expected_patterns_to_find:
+        assert expected_pattern_to_find in generated_proto
 
 
 def test_router_with_containers():
-    proto = gen_proto_file_contents(router_with_containers.routes)
-    patterns_to_find = (
+    expected_patterns_to_find = (
         """pydantic2protobuf/pydantic2protobuf/services/fastapi_to_proto.py.  DO NOT EDIT!
 syntax = "proto3";
 
@@ -68,5 +67,6 @@ import "google/protobuf/empty.proto";
     uint32 unsigned_integer_field = 3;
 }""",
     )
-    for pattern_to_find in patterns_to_find:
-        assert pattern_to_find in proto
+    generated_proto = gen_proto_file_contents(router_with_containers.routes)
+    for expected_pattern_to_find in expected_patterns_to_find:
+        assert expected_pattern_to_find in generated_proto
