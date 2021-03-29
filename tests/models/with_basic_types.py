@@ -9,7 +9,7 @@ class WithBasicTypes(IBaseModelForUTest):
     unsigned_integer_field: PositiveInt
 
     @staticmethod
-    def get_expected_protobuf():
+    def _get_expected_protobuf():
         return """message WithBasicTypes {
     float float_field = 1;
     int32 integer_field = 2;

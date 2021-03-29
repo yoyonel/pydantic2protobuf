@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Optional
 
 from pydantic2protobuf.tools.pydantic_protobuf_types import UInt32Value
@@ -9,7 +10,7 @@ class WithOptionalFields(IBaseModelForUTest):
     optional_int: Optional[UInt32Value]
 
     @staticmethod
-    def get_expected_protobuf():
+    def _get_expected_protobuf():
         return """message WithOptionalFields {
     google.protobuf.StringValue optional_string = 1;
     google.protobuf.UInt32Value optional_int = 2;
@@ -18,4 +19,4 @@ class WithOptionalFields(IBaseModelForUTest):
 
 
 if __name__ == "__main__":
-    print(WithOptionalFields().schema())
+    pprint(WithOptionalFields().schema())

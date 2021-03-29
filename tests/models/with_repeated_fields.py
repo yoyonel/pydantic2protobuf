@@ -9,7 +9,7 @@ class WithRepeatedFields(IBaseModelForUTest):
     repeated_structured_type_field: List[WithBasicTypes]
 
     @staticmethod
-    def get_expected_protobuf() -> str:
+    def _get_expected_protobuf() -> str:
         return """message WithRepeatedFields {
     repeated string repeated_string_field = 1;
     repeated WithBasicTypes repeated_structured_type_field = 2;

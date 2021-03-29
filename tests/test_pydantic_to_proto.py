@@ -26,7 +26,7 @@ class ParametrizationCasePMTPM(IParametrizationCase):
 @IParametrizationCase.case(ParametrizationCasePMTPM("with repeated fields", WithRepeatedFields))
 def test_pydantic_model_to_proto_msg(pydantic_model: IBaseModelForUTest):
     generated_proto_msg = gen_message_definition(pydantic_model)
-    assert generated_proto_msg == pydantic_model.get_expected_protobuf()
+    assert generated_proto_msg == pydantic_model._get_expected_protobuf()
 
 
 @dataclass
