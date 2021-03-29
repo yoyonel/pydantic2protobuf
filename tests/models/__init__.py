@@ -6,5 +6,5 @@ from pydantic.main import BaseModel
 class IBaseModelForUTest(BaseModel, ABC):
     @staticmethod
     @abstractmethod
-    def get_expected_protobuf() -> str:
+    def _get_expected_protobuf() -> str:
         pass

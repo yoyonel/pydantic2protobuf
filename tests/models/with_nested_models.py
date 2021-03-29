@@ -35,7 +35,7 @@ class WithNestedModelsResponse(IBaseModelForUTest):
     app: Optional[StartupInfos] = Field(None)
 
     @staticmethod
-    def get_expected_protobuf() -> str:
+    def _get_expected_protobuf() -> str:
         return """message WithNestedModelsResponse {
     WebServerInfos webserver = 1;
     GRPCInfo grpc = 2;
