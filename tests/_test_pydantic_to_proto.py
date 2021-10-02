@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Type
 
-from parametrization import Parametrization
+from parametrization import Parametrization  # type: ignore
 from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
