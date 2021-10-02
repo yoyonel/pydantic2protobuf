@@ -19,7 +19,7 @@ import "google/protobuf/empty.proto";"""
 
 def add_stream_qualifier(outer_type: Any) -> str:
     """"""
-    return f"{'stream ' if is_type_iterable(outer_type) else ''}"
+    return f"""{"stream " if is_type_iterable(outer_type) else ""}"""
 
 
 def gen_service_method_request(route: APIRoute) -> str:

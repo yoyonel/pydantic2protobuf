@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from parametrization import Parametrization
+from parametrization import Parametrization  # type: ignore
 
 from pydantic2protobuf.tools.from_pydantic import DEFAULT_DICT_FOR_PROTO_FIELDS, extract_proto_fields, gen_extra_fields
 from tests.tools.parametrization_case import IParametrizationCase

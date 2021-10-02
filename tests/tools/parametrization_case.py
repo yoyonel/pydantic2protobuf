@@ -5,7 +5,7 @@ from abc import ABC
 from dataclasses import InitVar, asdict, dataclass, field
 from typing import Optional
 
-from parametrization import Parametrization
+from parametrization import Parametrization  # type: ignore
 
 
 @dataclass

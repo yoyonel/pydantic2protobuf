@@ -28,10 +28,10 @@ def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_nu
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
     if proto_fields.get("protobuf_message"):
         return proto_fields["protobuf_message"]
-    result = f"{tab}{'// disabled: ' if proto_fields.get('disable_rpc') else ''}"
+    result = f"""{tab}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
     result += f"{add_repeated_qualifier(field.outer_type_)}"
-    result += f"{'u' if proto_fields.get('is_unsigned') else ''}{translate_type(field, proto_fields)} "
-    result += f"{field.name} = {proto_fields.get('number')};"
+    result += f"""{"u" if proto_fields.get("is_unsigned") else ""}{translate_type(field, proto_fields)} """
+    result += f"""{field.name} = {proto_fields.get("number")};"""
     return result
 
 

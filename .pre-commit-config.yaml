@@ -27,6 +27,7 @@ repos:
   - repo: local
     hooks:
       - id: mypy
+        args: [--python-version=3.9]
         name: mypy
         language: system
         entry: poetry run mypy
