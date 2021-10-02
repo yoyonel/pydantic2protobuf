@@ -27,7 +27,8 @@ def translate_type(field: ModelField, proto_fields: dict) -> str:
 def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> str:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
     if proto_fields.get("protobuf_message"):
-        return proto_fields["protobuf_message"]
+        return f"{tab}{f'{new_line}{tab}'.join(proto_fields['protobuf_message'].split(new_line))}"
+    # TODO: Maybe deactivate generation if disabled (~ early exit, like manual protobuf message passing above)
     result = f"""{tab}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
     result += f"{add_repeated_qualifier(field.outer_type_)}"
     result += f"""{"u" if proto_fields.get("is_unsigned") else ""}{translate_type(field, proto_fields)} """

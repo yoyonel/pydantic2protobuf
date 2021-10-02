@@ -10,6 +10,7 @@ from tests.models import IBaseModelForUTest
 from tests.models.with_basic_types import WithBasicTypes
 from tests.models.with_nested_models import WithNestedModelsResponse
 from tests.models.with_optional_fields import WithOptionalFields
+from tests.models.with_protobuf_message import WithProtobufMessage
 from tests.models.with_repeated_fields import WithRepeatedFields
 from tests.tools.parametrization_case import IParametrizationCase
 
@@ -24,6 +25,7 @@ class ParametrizationCasePMTPM(IParametrizationCase):
 @IParametrizationCase.case(ParametrizationCasePMTPM("with optional fields", WithOptionalFields))
 @IParametrizationCase.case(ParametrizationCasePMTPM("with nested models", WithNestedModelsResponse))
 @IParametrizationCase.case(ParametrizationCasePMTPM("with repeated fields", WithRepeatedFields))
+@IParametrizationCase.case(ParametrizationCasePMTPM("with protobuf message", WithProtobufMessage))
 def test_pydantic_model_to_proto_msg(pydantic_model: IBaseModelForUTest):
     generated_proto_msg = gen_message_definition(pydantic_model)
     assert generated_proto_msg == pydantic_model._get_expected_protobuf()
