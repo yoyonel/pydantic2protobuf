@@ -67,6 +67,9 @@ grpcio-tools = "^1.41.0"
 pytest-shell = "^0.2.3"
 mypy-protobuf = "^2.10"
 
+[tool.poetry.scripts]
+pydantic2proto = "pydantic2protobuf.cli_app:entry_point"
+
 [tool.black]
 line-length = 120
 skip-string-normalization = true
