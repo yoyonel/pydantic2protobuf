@@ -1,6 +1,9 @@
 import logging
-from typing import Final
 
+try:
+    from typing import Final
+except ImportError:
+    from typing import Optional as Final
 import click
 
 from pydantic2protobuf.services.fastapi_to_proto import gen_proto_file_contents
@@ -17,6 +20,7 @@ def gen_proto_for_services():
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
+@click.version_option()
 @click.option("--log-level", default="WARN", help="set logging level")
 def entry_point(log_level):
     logging.getLogger(app_name).setLevel(getattr(logging, log_level.upper()))
