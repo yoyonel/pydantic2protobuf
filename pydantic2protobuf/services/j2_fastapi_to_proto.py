@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Iterator, Union
 
 from fastapi.routing import APIRoute
 
@@ -17,24 +17,29 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/empty.proto";"""
 
 
-@dataclass
-class MethodRequest:
-    empty_google_type: bool
-    is_type_iterable: bool
-    type_name: Optional[str]
+@dataclass(frozen=True)
+class EmptyGoogleType:
+    ...
 
 
-MethodResponse = MethodRequest
+@dataclass(frozen=True)
+class TypeDefinition:
+    is_iterable: bool
+    name: str
 
 
-@dataclass
+MethodResponse = Union[EmptyGoogleType, TypeDefinition]
+MethodRequest = Union[EmptyGoogleType, TypeDefinition]
+
+
+@dataclass(frozen=True)
 class MethodDefinition:
     route_name: str
     request: MethodRequest
     response: MethodResponse
 
 
-@dataclass
+@dataclass(frozen=True)
 class ServiceDefinition:
     name: str
     methods_definitions: list[MethodDefinition]
@@ -45,36 +50,34 @@ class Messages:
     messages: list[MessageDefinition]
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProtoFileContent:
     service_definition: ServiceDefinition
     messages: list[MessageDefinition]
 
 
 def gen_service_method_request(route: APIRoute) -> MethodRequest:
-    empty_google_type = False
-    _is_type_iterable = False
-    type_name = None
+    result: MethodRequest
     try:
         request_body_params = route.dependant.body_params[0]
-        _is_type_iterable = is_type_iterable(request_body_params.outer_type_)
-        type_name = request_body_params.type_.__name__
+        result = TypeDefinition(
+            is_iterable=is_type_iterable(request_body_params.outer_type_), name=request_body_params.type_.__name__
+        )
     except IndexError:
-        empty_google_type = True
-    return MethodRequest(empty_google_type=empty_google_type, is_type_iterable=_is_type_iterable, type_name=type_name)
+        result = EmptyGoogleType()
+    return result
 
 
 def gen_service_method_response(route: APIRoute) -> MethodResponse:
-    empty_google_type = False
-    _is_type_iterable = False
-    type_name = None
+    result: MethodResponse
     try:
         response_field = route.response_field
-        _is_type_iterable = is_type_iterable(response_field.outer_type_)
-        type_name = response_field.type_.__name__
+        result = TypeDefinition(
+            is_iterable=is_type_iterable(response_field.outer_type_), name=response_field.type_.__name__
+        )
     except AttributeError:
-        empty_google_type = True
-    return MethodResponse(empty_google_type=empty_google_type, is_type_iterable=_is_type_iterable, type_name=type_name)
+        result = EmptyGoogleType()
+    return result
 
 
 def gen_service_method_definition(route: APIRoute) -> MethodDefinition:

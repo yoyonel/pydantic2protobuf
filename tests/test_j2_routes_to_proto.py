@@ -3,10 +3,11 @@ from dataclasses import asdict
 import pytest
 
 from pydantic2protobuf.services.j2_fastapi_to_proto import (
+    EmptyGoogleType,
     MethodDefinition,
-    MethodRequest,
     ProtoFileContent,
     ServiceDefinition,
+    TypeDefinition,
     gen_proto_file_contents,
 )
 from pydantic2protobuf.services.j2_pydantic_to_proto import FieldDefinition, MessageDefinition
@@ -27,10 +28,8 @@ service_name = "ServiceTest"
                     methods_definitions=[
                         MethodDefinition(
                             route_name='with_nested_models',
-                            request=MethodRequest(empty_google_type=True, is_type_iterable=False, type_name=None),
-                            response=MethodRequest(
-                                empty_google_type=False, is_type_iterable=False, type_name='WithNestedModelsResponse'
-                            ),
+                            request=EmptyGoogleType(),
+                            response=TypeDefinition(is_iterable=False, name='WithNestedModelsResponse'),
                         )
                     ],
                 ),
