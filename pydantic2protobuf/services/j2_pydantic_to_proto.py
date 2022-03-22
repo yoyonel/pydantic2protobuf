@@ -12,18 +12,20 @@ from pydantic2protobuf.tools.from_pydantic import (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class FieldDefinition:
-    proto_message: Optional[str]
-    disable_rpc: Optional[bool]
-    is_iterable: Optional[bool]
-    is_unsigned: Optional[bool]
-    type_translated: str
     field_name: str
-    field_number: Optional[int]
+    type_translated: str
+
+    disable_rpc: bool
+    is_iterable: bool
+    is_unsigned: bool
+    field_number: int
+
+    proto_message: Optional[str]
 
 
-@dataclass
+@dataclass(frozen=True)
 class MessageDefinition:
     name: str
     fields: list[FieldDefinition]
@@ -39,12 +41,12 @@ def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_nu
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
     return FieldDefinition(
         proto_message=proto_fields.get("protobuf_message"),
-        disable_rpc=proto_fields.get("disable_rpc"),
+        disable_rpc=proto_fields["disable_rpc"],
         is_iterable=is_type_iterable(field.outer_type_),
-        is_unsigned=proto_fields.get("is_unsigned"),
+        is_unsigned=proto_fields["is_unsigned"],
         type_translated=translate_type(field, proto_fields),
         field_name=field.name,
-        field_number=proto_fields.get("number"),
+        field_number=proto_fields["number"],
     )
 
 
