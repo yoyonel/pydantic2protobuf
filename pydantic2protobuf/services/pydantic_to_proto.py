@@ -3,7 +3,7 @@ from typing import Dict, List
 from pydantic.fields import ModelField
 from pydantic.main import BaseModel, ModelMetaclass
 
-from pydantic2protobuf.tools.format import new_line, tab
+from pydantic2protobuf.tools.format import NEW_LINE, TAB
 from pydantic2protobuf.tools.from_pydantic import (
     PythonToGoogleProtoBufTypes,
     PythonToProtoBufTypes,
@@ -27,9 +27,9 @@ def translate_type(field: ModelField, proto_fields: dict) -> str:
 def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> str:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
     if proto_fields.get("protobuf_message"):
-        return f"{tab}{f'{new_line}{tab}'.join(proto_fields['protobuf_message'].split(new_line))}"
+        return f"{TAB}{f'{NEW_LINE}{TAB}'.join(proto_fields['protobuf_message'].split(NEW_LINE))}"
     # TODO: Maybe deactivate generation if disabled (~ early exit, like manual protobuf message passing above)
-    result = f"""{tab}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
+    result = f"""{TAB}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
     result += f"{add_repeated_qualifier(field.outer_type_)}"
     result += f"""{"u" if proto_fields.get("is_unsigned") else ""}{translate_type(field, proto_fields)} """
     result += f"""{field.name} = {proto_fields.get("number")};"""
@@ -45,7 +45,7 @@ def gen_fields_definitions(base_model: BaseModel) -> List[str]:
 
 
 def add_new_lines_and_indentation(lines: List[str], indent_level: int) -> str:
-    return new_line.join(f"{tab * indent_level}{line}" for line in lines)
+    return NEW_LINE.join(f"{TAB * indent_level}{line}" for line in lines)
 
 
 def gen_message_definition(base_model, indent_level: int = 0, prefix_name: str = "") -> str:
@@ -54,6 +54,6 @@ def gen_message_definition(base_model, indent_level: int = 0, prefix_name: str =
     message_definitions_lines = [
         f"message {prefix_name}{pydantic_model_meta_class.__qualname__} {{",
         *gen_fields_definitions(pydantic_base_model),
-        f"}}{new_line}",
+        f"}}{NEW_LINE}",
     ]
     return add_new_lines_and_indentation(message_definitions_lines, indent_level)
