@@ -136,7 +136,9 @@ def _build_field(
     ],
 )
 def test_router_with_nested_models(input_router, input_service_name, proto_file_content_expected: ProtoFileContent):
-    proto_file_content_computed = gen_proto_file_contents(input_router.routes, service_name=input_service_name)
+    proto_file_content_computed: ProtoFileContent = gen_proto_file_contents(
+        input_router.routes, service_name=input_service_name
+    )
     assert proto_file_content_computed.service_definition == proto_file_content_expected.service_definition
     assert sorted(map(asdict, proto_file_content_computed.messages), key=lambda message: message["name"]) == sorted(
         map(asdict, proto_file_content_expected.messages), key=lambda message: message["name"]

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterator, Union
+from typing import Iterator, Protocol, Union
 
 from fastapi.routing import APIRoute
 
@@ -47,6 +47,11 @@ class ProtoFileContent:
     messages: list[MessageDefinition]
 
 
+class ProtoFileContentSerializer(Protocol):
+    def __call__(self, proto_file_content: ProtoFileContent) -> str:
+        ...
+
+
 def gen_service_method_request(route: APIRoute) -> MethodRequest:
     result: MethodRequest
     try:
@@ -87,8 +92,12 @@ def gen_messages(routes: Iterator[APIRoute]) -> list[MessageDefinition]:
     return [gen_message_definition(model_meta_class) for model_meta_class in set(extract_model_meta_classes(routes))]
 
 
-def gen_proto_file_contents(routes: Iterator[APIRoute], service_name: str = "Service") -> ProtoFileContent:
-    return ProtoFileContent(
+def gen_proto_file_contents(
+    routes: Iterator[APIRoute],
+    service_name: str = "Service",
+) -> ProtoFileContent:
+    protobuf_file_content = ProtoFileContent(
         service_definition=gen_service_definition(service_name, routes),
         messages=gen_messages(routes),
     )
+    return protobuf_file_content

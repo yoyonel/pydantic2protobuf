@@ -4,7 +4,7 @@ from typing import Any, Iterator
 from fastapi.routing import APIRoute
 
 from pydantic2protobuf.services.pydantic_to_proto import gen_message_definition
-from pydantic2protobuf.tools.format import new_line, tab
+from pydantic2protobuf.tools.format import NEW_LINE, TAB
 from pydantic2protobuf.tools.from_fastapi import extract_model_meta_classes
 from pydantic2protobuf.tools.from_pydantic import is_type_iterable
 
@@ -40,7 +40,7 @@ def gen_service_method_response(route: APIRoute) -> str:
         return "google.protobuf.Empty"
 
 
-def gen_service_method_definition(route: APIRoute, prefix: str = tab) -> str:
+def gen_service_method_definition(route: APIRoute, prefix: str = TAB) -> str:
     """"""
     return f"{prefix}rpc do_{route.name} ({gen_service_method_request(route)}) returns ({gen_service_method_response(route)});"
 
@@ -48,20 +48,20 @@ def gen_service_method_definition(route: APIRoute, prefix: str = tab) -> str:
 def gen_service_definition(service_name, routes) -> str:
     """"""
     return f"""service {service_name} {{
-{new_line.join(map(gen_service_method_definition, routes))}
+{NEW_LINE.join(map(gen_service_method_definition, routes))}
 }}"""
 
 
 def gen_messages(routes: Iterator[APIRoute]) -> str:
     """"""
-    return new_line.join(
+    return NEW_LINE.join(
         gen_message_definition(model_meta_class) for model_meta_class in set(extract_model_meta_classes(routes))
     )
 
 
 def gen_proto_file_contents(routes: Iterator[APIRoute], service_name: str = "Service") -> str:
     """"""
-    return (2 * new_line).join(
+    return (2 * NEW_LINE).join(
         (
             proto_header,
             gen_service_definition(service_name, routes),
