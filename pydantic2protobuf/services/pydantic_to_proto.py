@@ -5,6 +5,7 @@ from pydantic.main import BaseModel, ModelMetaclass
 
 from pydantic2protobuf.tools.format import NEW_LINE, TAB
 from pydantic2protobuf.tools.from_pydantic import (
+    ProtoFieldsDefinition,
     PythonToGoogleProtoBufTypes,
     PythonToProtoBufTypes,
     extract_proto_fields,
@@ -17,22 +18,22 @@ def add_repeated_qualifier(field: ModelField) -> str:
     return "repeated " if is_type_iterable(field) else ""
 
 
-def translate_type(field: ModelField, proto_fields: dict) -> str:
+def translate_type(field: ModelField, proto_fields: ProtoFieldsDefinition) -> str:
     """"""
-    field_allow_none = bool(proto_fields.get("allow_none") and field.allow_none)
+    field_allow_none = bool(proto_fields.allow_none and field.allow_none)
     map_for_types = (PythonToProtoBufTypes, PythonToGoogleProtoBufTypes)[field_allow_none]
     return map_for_types.get(field.type_) or field.type_.__qualname__
 
 
 def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> str:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
-    if proto_fields.get("protobuf_message"):
-        return f"{TAB}{f'{NEW_LINE}{TAB}'.join(proto_fields['protobuf_message'].split(NEW_LINE))}"
+    if proto_fields.protobuf_message:
+        return f"{TAB}{f'{NEW_LINE}{TAB}'.join(proto_fields.protobuf_message.split(NEW_LINE))}"
     # TODO: Maybe deactivate generation if disabled (~ early exit, like manual protobuf message passing above)
-    result = f"""{TAB}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
+    result = f"""{TAB}{"// disabled: " if proto_fields.disable_rpc else ""}"""
     result += f"{add_repeated_qualifier(field.outer_type_)}"
-    result += f"""{"u" if proto_fields.get("is_unsigned") else ""}{translate_type(field, proto_fields)} """
-    result += f"""{field.name} = {proto_fields.get("number")};"""
+    result += f"""{"u" if proto_fields.is_unsigned else ""}{translate_type(field, proto_fields)} """
+    result += f"""{field.name} = {proto_fields.number};"""
     return result
 
 

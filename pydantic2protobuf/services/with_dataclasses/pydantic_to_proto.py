@@ -5,6 +5,7 @@ from pydantic.fields import ModelField
 from pydantic.main import BaseModel, ModelMetaclass
 
 from pydantic2protobuf.tools.from_pydantic import (
+    ProtoFieldsDefinition,
     PythonToGoogleProtoBufTypes,
     PythonToProtoBufTypes,
     extract_proto_fields,
@@ -31,8 +32,8 @@ class MessageDefinition:
     fields: list[FieldDefinition]
 
 
-def translate_type(field: ModelField, proto_fields: dict) -> str:
-    field_allow_none = bool(proto_fields.get("allow_none") and field.allow_none)
+def translate_type(field: ModelField, proto_fields: ProtoFieldsDefinition) -> str:
+    field_allow_none = bool(proto_fields.allow_none and field.allow_none)
     map_for_types = (PythonToProtoBufTypes, PythonToGoogleProtoBufTypes)[field_allow_none]
     return map_for_types.get(field.type_) or field.type_.__qualname__
 
@@ -40,13 +41,13 @@ def translate_type(field: ModelField, proto_fields: dict) -> str:
 def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> FieldDefinition:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
     return FieldDefinition(
-        proto_message=proto_fields.get("protobuf_message"),
-        disable_rpc=proto_fields["disable_rpc"],
+        proto_message=proto_fields.protobuf_message,
+        disable_rpc=proto_fields.disable_rpc,
         is_iterable=is_type_iterable(field.outer_type_),
-        is_unsigned=proto_fields["is_unsigned"],
+        is_unsigned=proto_fields.is_unsigned,
         type_translated=translate_type(field, proto_fields),
         field_name=field.name,
-        field_number=proto_fields["number"],
+        field_number=proto_fields.number,
     )
 
 

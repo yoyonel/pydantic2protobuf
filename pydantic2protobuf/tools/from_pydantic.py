@@ -42,17 +42,7 @@ class ProtoFieldsDefinition:
     disable_rpc: bool = field(default=False)
 
     def to_cls_properties(self):
-        return {
-            "extra": {
-                "protobuf": {
-                    "number": self.number,
-                    "protobuf_message": self.protobuf_message,
-                    "allow_none": self.allow_none,
-                    "is_unsigned": self.is_unsigned,
-                    "disable_rpc": self.disable_rpc,
-                }
-            }
-        }
+        return {"extra": {"protobuf": asdict(self)}}
 
     @classmethod
     def from_cls_properties(cls, cls_properties: dict, default_number: int):
@@ -62,13 +52,6 @@ class ProtoFieldsDefinition:
             json_proto_fields = {"number": default_number}
         return cls(**json_proto_fields)
 
-
-DEFAULT_DICT_FOR_PROTO_FIELDS = {
-    "protobuf_message": None,
-    "allow_none": True,
-    "is_unsigned": False,
-    "disable_rpc": False,
-}
 
 LIST_TYPES_ITERABLES = {list, List, Iterable, abc.Iterable}
 
@@ -93,8 +76,8 @@ def gen_extra_fields(
     ).to_cls_properties()
 
 
-def extract_proto_fields(cls_properties: Dict, default_number: int) -> Dict:
-    return asdict(ProtoFieldsDefinition.from_cls_properties(cls_properties, default_number))
+def extract_proto_fields(cls_properties: Dict, default_number: int) -> ProtoFieldsDefinition:
+    return ProtoFieldsDefinition.from_cls_properties(cls_properties, default_number)
 
 
 def is_type_iterable(field: Any) -> bool:
