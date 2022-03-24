@@ -2,8 +2,6 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from tests.models import IBaseModelForUTest
-
 
 class GitInfo(BaseModel):
     branch_name: str = Field()
@@ -28,17 +26,8 @@ class GRPCInfo(BaseModel):
     timeout: float
 
 
-class WithNestedModelsResponse(IBaseModelForUTest):
+class WithNestedModelsResponse(BaseModel):
 
     webserver: WebServerInfos = Field()
     grpc: GRPCInfo = Field()
     app: Optional[StartupInfos] = Field(None)
-
-    @staticmethod
-    def _get_expected_protobuf() -> str:
-        return """message WithNestedModelsResponse {
-    WebServerInfos webserver = 1;
-    GRPCInfo grpc = 2;
-    StartupInfos app = 3;
-}
-"""

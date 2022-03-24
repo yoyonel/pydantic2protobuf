@@ -1,17 +1,10 @@
 from typing import List
 
-from tests.models import IBaseModelForUTest
+from pydantic import BaseModel
+
 from tests.models.with_basic_types import WithBasicTypes
 
 
-class WithRepeatedFields(IBaseModelForUTest):
+class WithRepeatedFields(BaseModel):
     repeated_string_field: List[str]
     repeated_structured_type_field: List[WithBasicTypes]
-
-    @staticmethod
-    def _get_expected_protobuf() -> str:
-        return """message WithRepeatedFields {
-    repeated string repeated_string_field = 1;
-    repeated WithBasicTypes repeated_structured_type_field = 2;
-}
-"""
