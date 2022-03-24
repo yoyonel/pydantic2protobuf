@@ -1,12 +1,19 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+import pytest
 from parametrization import Parametrization  # type: ignore
 from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
-from pydantic2protobuf.services.pydantic_to_proto import translate_type
+from pydantic2protobuf.services.pydantic_to_proto import (
+    FieldDefinition,
+    MessageDefinition,
+    gen_message_definition,
+    translate_type,
+)
 from pydantic2protobuf.tools.from_pydantic import ProtoFieldsDefinition
+from tests.models.with_basic_types import WithBasicTypes
 from tests.tools.parametrization_case import IParametrizationCase
 
 # @pytest.fixture
@@ -29,6 +36,59 @@ from tests.tools.parametrization_case import IParametrizationCase
 #     message_definition = gen_message_definition(pydantic_model)
 #     # generated_proto_msg = serializer(message_definition)
 #     # assert generated_proto_msg == pydantic_model._get_expected_protobuf()
+
+
+def build_field_definition(**kwargs) -> FieldDefinition:
+    return FieldDefinition(
+        **{  # type: ignore
+            **{
+                "disable_rpc": False,
+                "is_iterable": False,
+                "is_unsigned": False,
+                "proto_message": None,
+            },
+            **kwargs,
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "base_model,expected_message_definition",
+    [
+        pytest.param(
+            WithBasicTypes,
+            MessageDefinition(
+                name='WithBasicTypes',
+                fields=[
+                    build_field_definition(
+                        field_name='float_field',
+                        type_translated='float',
+                        field_number=1,
+                    ),
+                    build_field_definition(
+                        field_name='integer_field',
+                        type_translated='int32',
+                        field_number=2,
+                    ),
+                    build_field_definition(
+                        field_name='unsigned_integer_field',
+                        type_translated='uint32',
+                        field_number=3,
+                    ),
+                ],
+            ),
+            id="with basic types",
+        )
+    ]
+    # TODO: continue utest params
+    # pytest.param(WithOptionalFields, ...)
+    # pytest.param(WithNestedModelsResponse, ...)
+    # pytest.param(WithRepeatedFields, ...)
+    # pytest.param(WithProtobufMessage, ...)
+)
+def test_pydantic_model_to_message_definition(base_model, expected_message_definition):
+    message_definition = gen_message_definition(base_model)
+    assert message_definition == expected_message_definition
 
 
 @dataclass
