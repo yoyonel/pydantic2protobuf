@@ -80,13 +80,11 @@ def extract_proto_fields(cls_properties: Dict, default_number: int) -> ProtoFiel
     return ProtoFieldsDefinition.from_cls_properties(cls_properties, default_number)
 
 
-def is_type_iterable(field: Any) -> bool:
-    """"""
-    return getattr(field, "__origin__", None) in LIST_TYPES_ITERABLES or issubclass(field, Chunkify)
+def is_type_iterable(outer_type: Any) -> bool:
+    return getattr(outer_type, "__origin__", None) in LIST_TYPES_ITERABLES or issubclass(outer_type, Chunkify)
 
 
 def extract_model_meta_classes(model_meta_class: Any) -> Iterator[Type[ModelMetaclass]]:
-    """"""
     model_fields: Iterable[ModelField] = model_meta_class.__fields__.values()
     # TODO: remove recurrence
     model_meta_classes = [

@@ -14,12 +14,10 @@ from pydantic2protobuf.tools.from_pydantic import (
 
 
 def add_repeated_qualifier(field: ModelField) -> str:
-    """"""
     return "repeated " if is_type_iterable(field) else ""
 
 
 def translate_type(field: ModelField, proto_fields: ProtoFieldsDefinition) -> str:
-    """"""
     field_allow_none = bool(proto_fields.allow_none and field.allow_none)
     map_for_types = (PythonToProtoBufTypes, PythonToGoogleProtoBufTypes)[field_allow_none]
     return map_for_types.get(field.type_) or field.type_.__qualname__
