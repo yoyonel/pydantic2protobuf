@@ -16,7 +16,7 @@ class IParametrizationCase(ABC):
 
     def __post_init__(self, name_init: Optional[str]):
         if self.__class__ == IParametrizationCase:
-            raise TypeError("Cannot instantiate abstract class.")
+            raise TypeError("Cannot instantiate abstract class.")  # pragma: no cover
         self.name = name_init
         if self.name == "":
             self.name = None
@@ -25,11 +25,9 @@ class IParametrizationCase(ABC):
         return iter(asdict(self).items())
 
     @classmethod
-    def create(cls, name_init=None, **kwargs):
-        return cls(name_init=name_init, **kwargs)
-
-    @classmethod
     def case(cls, parametrization_case):
         if not isinstance(parametrization_case, IParametrizationCase):
-            raise TypeError(f"{parametrization_case} not an instance of abstract class: {IParametrizationCase}")
+            raise TypeError(
+                f"{parametrization_case} not an instance of abstract class: {IParametrizationCase}"
+            )  # pragma: no cover
         return Parametrization.case(**dict(parametrization_case))

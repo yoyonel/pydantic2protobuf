@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from parametrization import Parametrization  # type: ignore
 
-from pydantic2protobuf.tools.from_pydantic import DEFAULT_DICT_FOR_PROTO_FIELDS, extract_proto_fields, gen_extra_fields
+from pydantic2protobuf.tools.from_pydantic import ProtoFieldsDefinition, extract_proto_fields, gen_extra_fields
 from tests.tools.parametrization_case import IParametrizationCase
 
 
@@ -25,18 +25,25 @@ def test_gen_proto_field():
 @dataclass
 class ParametrizationCaseEPF(IParametrizationCase):
     properties: dict
-    default_number: int
-    dict_for_proto_fields_expected: dict
+    proto_fields_expected: ProtoFieldsDefinition
+
+
+def build_proto_fields_definition(is_unsigned: bool = False) -> ProtoFieldsDefinition:
+    return ProtoFieldsDefinition(is_unsigned=is_unsigned)
 
 
 @Parametrization.autodetect_parameters()
-@IParametrizationCase.case(ParametrizationCaseEPF("", {}, 1, DEFAULT_DICT_FOR_PROTO_FIELDS))
-@IParametrizationCase.case(ParametrizationCaseEPF("", {"dummy": "toto"}, 1, DEFAULT_DICT_FOR_PROTO_FIELDS))
+@IParametrizationCase.case(ParametrizationCaseEPF("", {}, build_proto_fields_definition()))
+@IParametrizationCase.case(ParametrizationCaseEPF("", {"dummy": "toto"}, build_proto_fields_definition()))
 @IParametrizationCase.case(
-    ParametrizationCaseEPF(
-        "", gen_extra_fields(1, is_unsigned=True), 1, {**DEFAULT_DICT_FOR_PROTO_FIELDS, **{"is_unsigned": True}}
-    )
+    ParametrizationCaseEPF("", gen_extra_fields(1, is_unsigned=True), build_proto_fields_definition(is_unsigned=True))
 )
-def test_extract_proto_fields(properties, default_number, dict_for_proto_fields_expected):
-    result_processed = extract_proto_fields(properties, default_number)
-    assert result_processed == {**dict_for_proto_fields_expected, **{"number": default_number}}
+def test_extract_proto_fields(properties, proto_fields_expected):
+    result_processed = extract_proto_fields(properties, default_number=1)
+    # FIX: understand why is needed to manually cast into dataclass object here !
+    proto_fields_expected = (
+        ProtoFieldsDefinition(**proto_fields_expected)
+        if isinstance(proto_fields_expected, dict)
+        else proto_fields_expected
+    )
+    assert result_processed == proto_fields_expected

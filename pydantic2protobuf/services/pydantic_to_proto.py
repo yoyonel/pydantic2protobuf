@@ -1,10 +1,11 @@
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Union
 
 from pydantic.fields import ModelField
 from pydantic.main import BaseModel, ModelMetaclass
 
-from pydantic2protobuf.tools.format import new_line, tab
 from pydantic2protobuf.tools.from_pydantic import (
+    ProtoFieldsDefinition,
     PythonToGoogleProtoBufTypes,
     PythonToProtoBufTypes,
     extract_proto_fields,
@@ -12,31 +13,52 @@ from pydantic2protobuf.tools.from_pydantic import (
 )
 
 
-def add_repeated_qualifier(field: ModelField) -> str:
-    """"""
-    return "repeated " if is_type_iterable(field) else ""
+@dataclass(frozen=True)
+class PydanticFieldDefinition:
+    field_name: str
+    type_translated: str
+
+    disable_rpc: bool
+    is_iterable: bool
+    is_unsigned: bool
+    field_number: int
 
 
-def translate_type(field: ModelField, proto_fields: dict) -> str:
-    """"""
-    field_allow_none = bool(proto_fields.get("allow_none") and field.allow_none)
+@dataclass(frozen=True)
+class ManualProtoMessageDefinition:
+    proto_message: str
+
+
+FieldDefinition = Union[PydanticFieldDefinition, ManualProtoMessageDefinition]
+
+
+@dataclass(frozen=True)
+class MessageDefinition:
+    name: str
+    fields: list[FieldDefinition]
+
+
+def translate_type(field: ModelField, proto_fields: ProtoFieldsDefinition) -> str:
+    field_allow_none = bool(proto_fields.allow_none and field.allow_none)
     map_for_types = (PythonToProtoBufTypes, PythonToGoogleProtoBufTypes)[field_allow_none]
     return map_for_types.get(field.type_) or field.type_.__qualname__
 
 
-def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> str:
+def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> FieldDefinition:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
-    if proto_fields.get("protobuf_message"):
-        return f"{tab}{f'{new_line}{tab}'.join(proto_fields['protobuf_message'].split(new_line))}"
-    # TODO: Maybe deactivate generation if disabled (~ early exit, like manual protobuf message passing above)
-    result = f"""{tab}{"// disabled: " if proto_fields.get("disable_rpc") else ""}"""
-    result += f"{add_repeated_qualifier(field.outer_type_)}"
-    result += f"""{"u" if proto_fields.get("is_unsigned") else ""}{translate_type(field, proto_fields)} """
-    result += f"""{field.name} = {proto_fields.get("number")};"""
-    return result
+    if proto_fields.protobuf_message:
+        return ManualProtoMessageDefinition(proto_message=proto_fields.protobuf_message)
+    return PydanticFieldDefinition(
+        disable_rpc=proto_fields.disable_rpc,
+        is_iterable=is_type_iterable(field.outer_type_),
+        is_unsigned=proto_fields.is_unsigned,
+        type_translated=translate_type(field, proto_fields),
+        field_name=field.name,
+        field_number=proto_fields.number,
+    )
 
 
-def gen_fields_definitions(base_model: BaseModel) -> List[str]:
+def gen_fields_definitions(base_model: BaseModel) -> List[FieldDefinition]:
     cls_properties = base_model.schema()["properties"]
     return [
         gen_field_definition(field, cls_properties[field.name], default_number)
@@ -44,16 +66,9 @@ def gen_fields_definitions(base_model: BaseModel) -> List[str]:
     ]
 
 
-def add_new_lines_and_indentation(lines: List[str], indent_level: int) -> str:
-    return new_line.join(f"{tab * indent_level}{line}" for line in lines)
-
-
-def gen_message_definition(base_model, indent_level: int = 0, prefix_name: str = "") -> str:
+def gen_message_definition(base_model) -> MessageDefinition:
     pydantic_base_model: BaseModel = base_model
     pydantic_model_meta_class: ModelMetaclass = base_model
-    message_definitions_lines = [
-        f"message {prefix_name}{pydantic_model_meta_class.__qualname__} {{",
-        *gen_fields_definitions(pydantic_base_model),
-        f"}}{new_line}",
-    ]
-    return add_new_lines_and_indentation(message_definitions_lines, indent_level)
+    return MessageDefinition(
+        name=pydantic_model_meta_class.__qualname__, fields=gen_fields_definitions(pydantic_base_model)
+    )

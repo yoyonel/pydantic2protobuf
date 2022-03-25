@@ -1,2 +1,2 @@
-tab = " " * 4
-new_line = "\n"
+TAB = " " * 4
+NEW_LINE = "\n"
