@@ -1,34 +1,13 @@
-from typing import List, Optional
+from typing import List
 
 import pytest
 
 from pydantic2protobuf.services.fastapi_to_proto import ProtoFileContent, gen_proto_file_contents
-from pydantic2protobuf.services.pydantic_to_proto import FieldDefinition
 from pydantic2protobuf.services.serializer.with_fstring import ProtoFileContentSerializerWithFString
 from tests.api.with_containers import router as router_with_containers
 from tests.api.with_nested_fields import router as router_with_nested_models
 
 service_name = "ServiceTest"
-
-
-def _build_field(
-    type_translated: str,
-    field_name: str,
-    field_number: int,
-    proto_message: Optional[str] = None,
-    disable_rpc: bool = False,
-    is_iterable: bool = False,
-    is_unsigned: bool = False,
-) -> FieldDefinition:
-    return FieldDefinition(
-        proto_message=proto_message,
-        disable_rpc=disable_rpc,
-        is_iterable=is_iterable,
-        is_unsigned=is_unsigned,
-        type_translated=type_translated,
-        field_name=field_name,
-        field_number=field_number,
-    )
 
 
 @pytest.mark.parametrize(

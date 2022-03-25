@@ -5,7 +5,11 @@ from parametrization import Parametrization  # type: ignore
 from pydantic import BaseModel
 from pydantic import create_model as create_pydantic_model
 
-from pydantic2protobuf.services.pydantic_to_proto import FieldDefinition, MessageDefinition, gen_message_definition
+from pydantic2protobuf.services.pydantic_to_proto import (
+    MessageDefinition,
+    PydanticFieldDefinition,
+    gen_message_definition,
+)
 from tests.tools.parametrization_case import IParametrizationCase
 
 
@@ -24,23 +28,21 @@ class ParametrizationCase(IParametrizationCase):
             MessageDefinition(
                 name='Model',
                 fields=[
-                    FieldDefinition(
+                    PydanticFieldDefinition(
                         field_name='a',
                         type_translated='float',
                         disable_rpc=False,
                         is_iterable=False,
                         is_unsigned=False,
                         field_number=1,
-                        proto_message=None,
                     ),
-                    FieldDefinition(
+                    PydanticFieldDefinition(
                         field_name='b',
                         type_translated='int32',
                         disable_rpc=False,
                         is_iterable=False,
                         is_unsigned=False,
                         field_number=2,
-                        proto_message=None,
                     ),
                 ],
             )
@@ -57,23 +59,21 @@ class ParametrizationCase(IParametrizationCase):
             MessageDefinition(
                 name='InfoSentenceRequest',
                 fields=[
-                    FieldDefinition(
+                    PydanticFieldDefinition(
                         field_name='text',
                         type_translated='google.protobuf.StringValue',
                         disable_rpc=False,
                         is_iterable=False,
                         is_unsigned=False,
                         field_number=1,
-                        proto_message=None,
                     ),
-                    FieldDefinition(
+                    PydanticFieldDefinition(
                         field_name='skill_id',
                         type_translated='google.protobuf.Int64Value',
                         disable_rpc=False,
                         is_iterable=False,
                         is_unsigned=False,
                         field_number=2,
-                        proto_message=None,
                     ),
                 ],
             )

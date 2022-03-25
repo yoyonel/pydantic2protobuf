@@ -20,4 +20,4 @@ class UInt32Value(PositiveInt):
 
     @classmethod
     def validate(cls, v):
-        return cls.validate(v)
+        return cls.validate(v)  # pragma: no cover

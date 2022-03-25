@@ -49,7 +49,7 @@ class ProtoFileContent:
 
 class ProtoFileContentSerializer(Protocol):
     def __call__(self, proto_file_content: ProtoFileContent) -> str:
-        ...
+        ...  # pragma: no cover
 
 
 def gen_service_method_request(route: APIRoute) -> MethodRequest:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Union
 
 from pydantic.fields import ModelField
 from pydantic.main import BaseModel, ModelMetaclass
@@ -14,7 +14,7 @@ from pydantic2protobuf.tools.from_pydantic import (
 
 
 @dataclass(frozen=True)
-class FieldDefinition:
+class PydanticFieldDefinition:
     field_name: str
     type_translated: str
 
@@ -23,7 +23,13 @@ class FieldDefinition:
     is_unsigned: bool
     field_number: int
 
-    proto_message: Optional[str]
+
+@dataclass(frozen=True)
+class ManualProtoMessageDefinition:
+    proto_message: str
+
+
+FieldDefinition = Union[PydanticFieldDefinition, ManualProtoMessageDefinition]
 
 
 @dataclass(frozen=True)
@@ -40,8 +46,9 @@ def translate_type(field: ModelField, proto_fields: ProtoFieldsDefinition) -> st
 
 def gen_field_definition(field: ModelField, field_properties: Dict, enumerate_number: int) -> FieldDefinition:
     proto_fields = extract_proto_fields(field_properties, default_number=enumerate_number)
-    return FieldDefinition(
-        proto_message=proto_fields.protobuf_message,
+    if proto_fields.protobuf_message:
+        return ManualProtoMessageDefinition(proto_message=proto_fields.protobuf_message)
+    return PydanticFieldDefinition(
         disable_rpc=proto_fields.disable_rpc,
         is_iterable=is_type_iterable(field.outer_type_),
         is_unsigned=proto_fields.is_unsigned,

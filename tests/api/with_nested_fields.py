@@ -7,4 +7,4 @@ router = APIRouter()
 
 @router.get("/with_nested_models", response_model=WithNestedModelsResponse)
 async def with_nested_models() -> WithNestedModelsResponse:
-    return WithNestedModelsResponse()
+    return WithNestedModelsResponse()  # pragma: no cover

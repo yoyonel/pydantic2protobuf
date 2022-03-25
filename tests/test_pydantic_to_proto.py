@@ -8,44 +8,30 @@ from pydantic import create_model as create_pydantic_model
 
 from pydantic2protobuf.services.pydantic_to_proto import (
     FieldDefinition,
+    ManualProtoMessageDefinition,
     MessageDefinition,
+    PydanticFieldDefinition,
     gen_message_definition,
     translate_type,
 )
 from pydantic2protobuf.tools.from_pydantic import ProtoFieldsDefinition
 from tests.models.with_basic_types import WithBasicTypes
+from tests.models.with_nested_models import WithNestedModelsResponse
+from tests.models.with_optional_fields import WithOptionalFields
+from tests.models.with_protobuf_message import WithProtobufMessage
+from tests.models.with_repeated_fields import WithRepeatedFields
 from tests.tools.parametrization_case import IParametrizationCase
-
-# @pytest.fixture
-# def serializer():
-#     return ProtoFileContentSerializerWithFString()
-#
-#
-# @dataclass
-# class ParametrizationCasePMTPM(IParametrizationCase):
-#     pydantic_model: Type[IBaseModelForUTest]
-#
-#
-# @Parametrization.autodetect_parameters()
-# @IParametrizationCase.case(ParametrizationCasePMTPM("with basic types", WithBasicTypes))
-# @IParametrizationCase.case(ParametrizationCasePMTPM("with optional fields", WithOptionalFields))
-# @IParametrizationCase.case(ParametrizationCasePMTPM("with nested models", WithNestedModelsResponse))
-# @IParametrizationCase.case(ParametrizationCasePMTPM("with repeated fields", WithRepeatedFields))
-# @IParametrizationCase.case(ParametrizationCasePMTPM("with protobuf message", WithProtobufMessage))
-# def test_pydantic_model_to_proto_msg(pydantic_model: IBaseModelForUTest):
-#     message_definition = gen_message_definition(pydantic_model)
-#     # generated_proto_msg = serializer(message_definition)
-#     # assert generated_proto_msg == pydantic_model._get_expected_protobuf()
 
 
 def build_field_definition(**kwargs) -> FieldDefinition:
-    return FieldDefinition(
+    if kwargs.get("protobuf_message"):
+        return ManualProtoMessageDefinition(proto_message=kwargs["protobuf_message"])  # pragma: no cover
+    return PydanticFieldDefinition(
         **{  # type: ignore
             **{
                 "disable_rpc": False,
                 "is_iterable": False,
                 "is_unsigned": False,
-                "proto_message": None,
             },
             **kwargs,
         }
@@ -78,13 +64,89 @@ def build_field_definition(**kwargs) -> FieldDefinition:
                 ],
             ),
             id="with basic types",
-        )
-    ]
-    # TODO: continue utest params
-    # pytest.param(WithOptionalFields, ...)
-    # pytest.param(WithNestedModelsResponse, ...)
-    # pytest.param(WithRepeatedFields, ...)
-    # pytest.param(WithProtobufMessage, ...)
+        ),
+        pytest.param(
+            WithOptionalFields,
+            MessageDefinition(
+                name='WithOptionalFields',
+                fields=[
+                    build_field_definition(
+                        field_name='optional_string', type_translated='google.protobuf.StringValue', field_number=1
+                    ),
+                    build_field_definition(
+                        field_name='optional_int',
+                        type_translated='google.protobuf.UInt32Value',
+                        field_number=2,
+                    ),
+                ],
+            ),
+            id="with optional fields",
+        ),
+        pytest.param(
+            WithNestedModelsResponse,
+            MessageDefinition(
+                name='WithNestedModelsResponse',
+                fields=[
+                    build_field_definition(
+                        field_name='webserver',
+                        type_translated='WebServerInfos',
+                        field_number=1,
+                    ),
+                    build_field_definition(
+                        field_name='grpc',
+                        type_translated='GRPCInfo',
+                        field_number=2,
+                    ),
+                    build_field_definition(
+                        field_name='app',
+                        type_translated='StartupInfos',
+                        field_number=3,
+                    ),
+                ],
+            ),
+            id="with nested models response",
+        ),
+        pytest.param(
+            WithRepeatedFields,
+            MessageDefinition(
+                name='WithRepeatedFields',
+                fields=[
+                    build_field_definition(
+                        field_name='repeated_string_field', type_translated='string', is_iterable=True, field_number=1
+                    ),
+                    build_field_definition(
+                        field_number=2,
+                        field_name='repeated_structured_type_field',
+                        is_iterable=True,
+                        type_translated='WithBasicTypes',
+                    ),
+                ],
+            ),
+            id="with repeated fields",
+        ),
+        pytest.param(
+            WithProtobufMessage,
+            MessageDefinition(
+                name='WithProtobufMessage',
+                fields=[
+                    build_field_definition(field_name='float_field', type_translated='float', field_number=1),
+                    build_field_definition(field_number=2, field_name='integer_field', type_translated='int32'),
+                    ManualProtoMessageDefinition(
+                        proto_message="""\
+message WithProtobufMessageField {
+    message TupleIds {
+        uint32 id_a = 1;
+        uint32 id_b = 2;
+    }
+    repeated TupleIds paired_ids = 1;
+}
+WithProtobufMessageField pairedIds = 3;"""
+                    ),
+                ],
+            ),
+            id="with protobuf message",
+        ),
+    ],
 )
 def test_pydantic_model_to_message_definition(base_model, expected_message_definition):
     message_definition = gen_message_definition(base_model)
@@ -95,21 +157,6 @@ def test_pydantic_model_to_message_definition(base_model, expected_message_defin
 class ParametrizationCaseARQ(IParametrizationCase):
     field_definition: Dict[str, Tuple]
     repeated_qualifier_expected: str
-
-
-# @Parametrization.autodetect_parameters()
-# @IParametrizationCase.case(
-#     ParametrizationCaseARQ("with optional string", {"text": (Optional[str], None)}, repeated_qualifier_expected='')
-# )
-# @IParametrizationCase.case(
-#     ParametrizationCaseARQ(
-#         "with strings list", {"texts": (Optional[List[str]], None)}, repeated_qualifier_expected='repeated '
-#     )
-# )
-# def test_add_repeated_qualifier(field_definition, repeated_qualifier_expected):
-#     pydantic_model = create_pydantic_model("", **field_definition, __base__=BaseModel)
-#     result_compute = add_repeated_qualifier(pydantic_model.__fields__[list(field_definition.keys())[0]].outer_type_)
-#     assert result_compute == repeated_qualifier_expected
 
 
 @dataclass
