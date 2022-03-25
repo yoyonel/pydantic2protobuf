@@ -10,7 +10,7 @@ class WithProtobufMessage(BaseModel):
     integer_field: int
     manual_protobuf_message_field: List[List[int]] = Field(
         ...,
-        description="""""",
+        description="",
         **gen_extra_fields(
             number=3,
             protobuf_message="""\

@@ -9,9 +9,9 @@ router = APIRouter()
 
 @router.get("/with_response_list", response_model=List[WithBasicTypes])
 async def with_response_list() -> List[WithBasicTypes]:
-    return []
+    return []  # pragma: no cover
 
 
 @router.get("/with_request_list")
 async def with_request_list(requests: List[WithBasicTypes]):
-    assert requests
+    assert requests  # pragma: no cover

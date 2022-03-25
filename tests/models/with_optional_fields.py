@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import Optional
 
 from pydantic import BaseModel
@@ -11,5 +10,5 @@ class WithOptionalFields(BaseModel):
     optional_int: Optional[UInt32Value]
 
 
-if __name__ == "__main__":
-    pprint(WithOptionalFields().schema())
+# if __name__ == "__main__":
+#     pprint(WithOptionalFields().schema())
