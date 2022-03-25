@@ -2,7 +2,7 @@
 https://www.python.org/dev/peps/pep-0557/#inheritance
 """
 from abc import ABC
-from dataclasses import InitVar, asdict, dataclass, field
+from dataclasses import InitVar, dataclass, field
 from typing import Optional
 
 from parametrization import Parametrization  # type: ignore
@@ -22,7 +22,7 @@ class IParametrizationCase(ABC):
             self.name = None
 
     def __iter__(self):
-        return iter(asdict(self).items())
+        return iter(self.__dict__.items())
 
     @classmethod
     def case(cls, parametrization_case):

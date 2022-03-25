@@ -154,13 +154,13 @@ def test_pydantic_model_to_message_definition(base_model, expected_message_defin
 
 
 @dataclass
-class ParametrizationCaseARQ(IParametrizationCase):
+class ImpParametrizationCase(IParametrizationCase):
     field_definition: Dict[str, Tuple]
     repeated_qualifier_expected: str
 
 
 @dataclass
-class ParametrizationCaseGPT(ParametrizationCaseARQ):
+class ImpParametrizationCaseWithDefaults(ImpParametrizationCase):
     proto_fields: ProtoFieldsDefinition = field(
         default_factory=lambda: ProtoFieldsDefinition(
             number=1,
@@ -174,15 +174,17 @@ class ParametrizationCaseGPT(ParametrizationCaseARQ):
 
 @Parametrization.autodetect_parameters()
 @IParametrizationCase.case(
-    ParametrizationCaseGPT(
+    ImpParametrizationCaseWithDefaults(
         "with repeated string", {"repeated_string_field": (List[str], None)}, repeated_qualifier_expected='string'
     )
 )
 @IParametrizationCase.case(
-    ParametrizationCaseGPT("with integer", {"integer_field": (int, None)}, repeated_qualifier_expected='int32')
+    ImpParametrizationCaseWithDefaults(
+        "with integer", {"integer_field": (int, None)}, repeated_qualifier_expected='int32'
+    )
 )
 @IParametrizationCase.case(
-    ParametrizationCaseGPT(
+    ImpParametrizationCaseWithDefaults(
         "with optional string",
         {"optional_string_field": (Optional[str], None)},
         repeated_qualifier_expected='google.protobuf.StringValue',
@@ -199,6 +201,4 @@ def test_get_protobuf_type(field_definition, repeated_qualifier_expected, proto_
     pydantic_model = create_pydantic_model("", **field_definition, __base__=BaseModel).__fields__[
         next(iter(field_definition.keys()))
     ]
-    # FIX: understand why is needed to manually cast into dataclass object here !
-    proto_fields = ProtoFieldsDefinition(**proto_fields) if isinstance(proto_fields, dict) else proto_fields
     assert translate_type(pydantic_model, proto_fields) == repeated_qualifier_expected
