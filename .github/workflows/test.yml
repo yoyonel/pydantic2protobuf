@@ -1,5 +1,7 @@
 name: Test & Lint
 
+# [Python 3.6 x64 on Linux: Error: Version 3.6 with arch x64 not found #544](https://github.com/actions/setup-python/issues/544#issuecomment-1320295576)
+
 on:
   pull_request:
   push:
@@ -23,7 +25,8 @@ jobs:
   lint:
     name: Lint
     needs: [lint_cruft]
-    runs-on: ubuntu-latest
+    #    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -48,7 +51,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        platform: [ubuntu-latest]
+#        platform: [ubuntu-latest]
+        platform: [ubuntu-20.04]
         python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
       - uses: actions/checkout@v2
@@ -74,7 +78,8 @@ jobs:
 
   coveralls_finish:
     needs: [test]
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Coveralls Finished
         uses: AndreMiras/coveralls-python-action@develop
