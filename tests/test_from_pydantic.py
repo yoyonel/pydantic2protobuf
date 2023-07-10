@@ -27,21 +27,25 @@ class ImpParametrizationCase(IParametrizationCase):
     properties: dict
     proto_fields_expected: ProtoFieldsDefinition
 
-
-def build_proto_fields_definition(is_unsigned: bool = False) -> ProtoFieldsDefinition:
-    return ProtoFieldsDefinition(is_unsigned=is_unsigned)
+    @staticmethod
+    def build_proto_fields_definition(is_unsigned: bool = False) -> ProtoFieldsDefinition:
+        return ProtoFieldsDefinition(is_unsigned=is_unsigned)
 
 
 @Parametrization.autodetect_parameters()
-@IParametrizationCase.case(ImpParametrizationCase("no extra proto field", {}, build_proto_fields_definition()))
 @IParametrizationCase.case(
-    ImpParametrizationCase("with dummy properties", {"dummy": "toto"}, build_proto_fields_definition())
+    ImpParametrizationCase("no extra proto field", {}, ImpParametrizationCase.build_proto_fields_definition())
+)
+@IParametrizationCase.case(
+    ImpParametrizationCase(
+        "with dummy properties", {"dummy": "toto"}, ImpParametrizationCase.build_proto_fields_definition()
+    )
 )
 @IParametrizationCase.case(
     ImpParametrizationCase(
         "with an unsigned proto field",
         gen_extra_fields(number=1, is_unsigned=True),
-        build_proto_fields_definition(is_unsigned=True),
+        ImpParametrizationCase.build_proto_fields_definition(is_unsigned=True),
     )
 )
 def test_extract_proto_fields(properties: dict, proto_fields_expected: ProtoFieldsDefinition):

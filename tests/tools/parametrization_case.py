@@ -17,9 +17,7 @@ class IParametrizationCase(ABC):
     def __post_init__(self, name_init: Optional[str]):
         if self.__class__ == IParametrizationCase:
             raise TypeError("Cannot instantiate abstract class.")  # pragma: no cover
-        self.name = name_init
-        if self.name == "":
-            self.name = None
+        self.name = name_init or None
 
     def __iter__(self):
         return iter(self.__dict__.items())

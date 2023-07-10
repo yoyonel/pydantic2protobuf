@@ -1,5 +1,7 @@
 import logging
 
+from pydantic2protobuf.services.serializer.with_fstring import ProtoFileContentSerializerWithFString
+
 try:
     from typing import Final
 except ImportError:
@@ -16,7 +18,9 @@ def gen_proto_for_services():
     # from webserver.api.commands_with_grpc import router as commands_with_grpc_router
     # api = commands_with_grpc_router.api
     routes = []
-    print(gen_proto_file_contents(routes))
+    serializer = ProtoFileContentSerializerWithFString()
+    generated_proto = serializer(gen_proto_file_contents(routes))
+    print(generated_proto)
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})

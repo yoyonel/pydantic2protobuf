@@ -20,7 +20,7 @@ class TypeDefinition:
 
 
 MethodResponse = Union[EmptyGoogleType, TypeDefinition]
-MethodRequest = Union[EmptyGoogleType, TypeDefinition]
+MethodRequest = MethodResponse
 
 
 @dataclass(frozen=True)
@@ -36,7 +36,7 @@ class ServiceDefinition:
     methods_definitions: list[MethodDefinition]
 
 
-@dataclass
+@dataclass(frozen=True)
 class Messages:
     messages: list[MessageDefinition]
 

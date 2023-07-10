@@ -32,7 +32,7 @@ PythonToGoogleProtoBufTypes: Dict[Any, str] = {
 }
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProtoFieldsDefinition:
     number: int = field(default=1)
 
