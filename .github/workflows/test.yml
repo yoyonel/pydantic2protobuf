@@ -1,7 +1,5 @@
 name: Test & Lint
 
-# [Python 3.6 x64 on Linux: Error: Version 3.6 with arch x64 not found #544](https://github.com/actions/setup-python/issues/544#issuecomment-1320295576)
-
 on:
   pull_request:
   push:
